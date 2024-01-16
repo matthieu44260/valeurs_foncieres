@@ -1,0 +1,5 @@
+.idea/
+data/
+.streamlit/
+init_db.py
+my_env/
