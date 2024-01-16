@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
+from typing import Union
 
 
 st.header("Trouvez des informations sur les biens vendus des 5 dernières années")
@@ -13,7 +14,7 @@ st.divider()
 con = duckdb.connect(database="donnees_immo/donnees.duckdb", read_only=False)
 
 
-def get_coordinates(city: str, street: str | None = None):
+def get_coordinates(city: str, street: Union[str, None] = None):
     """
     Renvoie les coordonnées GPS en fonction des paramètres fournis
     """
