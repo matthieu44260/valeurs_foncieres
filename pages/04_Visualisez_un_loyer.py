@@ -53,8 +53,9 @@ if commune:
     fourchette_haute = con.execute(f"SELECT fourchette_haute_au_m2 FROM table_donnees WHERE DEP = '{departement}' "
                                    f"AND commune = '{commune}'").fetchone()[0]
     st.markdown(" ")
-    st.markdown(f"Les loyers pour un bien ({type_bien}) dans la commune de {commune} varient entre "
-                f":blue[{fourchette_basse}] et :blue[{fourchette_haute}] € au m².")
+    st.markdown(f"<span style='font-size:24px;'>Les loyers pour un bien ({type_bien}) dans la commune de {commune} "
+                f"varient entre :blue[{fourchette_basse}] et :blue[{fourchette_haute}] € au m².</span>",
+                unsafe_allow_html=True)
     st.markdown(" ")
     col_d, col_e, col_f = st.columns(3)
     with col_d:
@@ -67,5 +68,6 @@ if commune:
 if calcul_loyer:
     loyer_bas = int(fourchette_basse*calcul_loyer)
     loyer_haut = int(fourchette_haute*calcul_loyer)
-    st.markdown(f"Pour une surface de {calcul_loyer} m², "
-                f"les loyers varient entre :blue[{loyer_bas}] et :blue[{loyer_haut}] €.")
+    st.markdown(f"<span style='font-size:24px;'>Pour une surface de {calcul_loyer} m², "
+                f"les loyers varient entre :blue[{loyer_bas}] et :blue[{loyer_haut}] €.</span>",
+                unsafe_allow_html=True)

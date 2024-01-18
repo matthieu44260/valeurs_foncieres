@@ -105,5 +105,5 @@ df = pd.DataFrame({
 
 if estimer:
     df_nrm = preprocessor.transform(df)
-    prix = int(model_maison.predict(df_nrm))
+    prix = str("{:,}".format(int(model_maison.predict(df_nrm)))).replace(',',' ')
     st.subheader(f"Ce bien est estimé à :blue[{prix} €]")

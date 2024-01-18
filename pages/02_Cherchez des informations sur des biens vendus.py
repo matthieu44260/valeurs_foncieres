@@ -40,8 +40,15 @@ def calculate_prices(req: str) -> None:
             message = "d'une maison"
         else:
             message = f"d'un {type_bien.lower()}"
-        st.write(f"Dans la zone sélectionée, le prix moyen {message} est de :blue[**{int(mid_value)} €**] "
-                 f"et le prix moyen au m² est de :blue[**{int(price_by_m)} €**].")
+        st.markdown("")
+        st.markdown("")
+        st.markdown("")
+        st.markdown("<span style='font-size:24px;'>Dans la zone sélectionée :</span>", unsafe_allow_html=True)
+        mid_value = str("{:,}".format(int(mid_value))).replace(',',' ')
+        st.markdown(f"<span style='font-size:24px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
+                    unsafe_allow_html=True)
+        st.write(f"<span style='font-size:24px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
+                 unsafe_allow_html=True)
 
 
 def display_examples(req: str) -> None:
@@ -208,9 +215,9 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     req = property_request(type_de_local=type_de_local, dep=departement, com=commune, rue=voie)
     dis_map, dis_info = st.columns([0.35, 0.65])
     with dis_map:
-        display_map(req)
-    with dis_info:
+        #display_map(req)
         calculate_prices(req)
+    with dis_info:
         display_examples(req)
     dis_var1, dis_var2 = st.columns(2)
     with dis_var1:
@@ -226,20 +233,23 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
 commune = ''
 section = ''
 voie = ''
-with st.sidebar:
+col_bien, col_dep, col_com, col_rue = st.columns(4)
+with col_bien:
     type_bien = st.selectbox(
         'Choisissez le type de bien',
         ['Maison', 'Appartement', 'Local'],
         index=None,
         placeholder='Type de bien'
     )
-    if type_bien:
-        if type_bien == 'Maison':
-            con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=False)
-        if type_bien == 'Appartement':
-            con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=False)
-        if type_bien == 'Local':
-            con = duckdb.connect(database="donnees_immo/vente_local.duckdb", read_only=False)
+
+if type_bien:
+    if type_bien == 'Maison':
+        con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=False)
+    if type_bien == 'Appartement':
+        con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=False)
+    if type_bien == 'Local':
+        con = duckdb.connect(database="donnees_immo/vente_local.duckdb", read_only=False)
+    with col_dep:
         department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees ORDER BY num_departement").df()
         departement = st.selectbox(
             'Choisissez votre département',
@@ -247,7 +257,8 @@ with st.sidebar:
             index=None,
             placeholder='Département'
         )
-        if departement:
+    if departement:
+        with col_com:
             city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE num_departement = '{departement}'"
                                       f" ORDER BY commune").df()
             commune = st.selectbox(
@@ -256,7 +267,8 @@ with st.sidebar:
                 index=None,
                 placeholder='Commune'
             )
-        if commune:
+    if commune:
+        with col_rue:
             street_choice = con.execute(f"SELECT DISTINCT voie FROM table_donnees"
                                         f" WHERE num_departement = '{departement}' AND commune = '{commune}'"
                                         f" ORDER BY voie").df()
