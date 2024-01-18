@@ -2,11 +2,15 @@ import pandas as pd
 import streamlit as st
 import duckdb
 from joblib import load
+from streamlit_extras.switch_page_button import switch_page
 
 model_maison = load('./donnees_immo/model_maison.joblib')
 preprocessor = load('./donnees_immo/preprocessor.joblib')
 
 con = duckdb.connect(database="donnees_immo/donnees.duckdb", read_only=False)
+
+if st.button("Accueil"):
+    switch_page("accueil")
 
 st.header("Estimez le prix d'un bien en complétant les critères et appuyez sur Estimation")
 st.divider()

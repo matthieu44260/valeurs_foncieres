@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
 from typing import Union
+from streamlit_extras.switch_page_button import switch_page
 
+if st.button("Accueil"):
+    switch_page("accueil")
 
 st.header("Trouvez des informations sur les biens vendus des 5 dernières années")
 st.divider()

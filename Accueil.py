@@ -1,14 +1,5 @@
 import streamlit as st
-import os
-import logging
-
-#if "data" not in os.listdir():
-#    logging.error(os.listdir())
-#    logging.error("création du fichier data")
-#    os.mkdir("data")
-#
-#if "donnees.duckdb" not in os.listdir("data"):
-#    exec(open("init_all_db.py").read())
+from streamlit_extras.switch_page_button import switch_page
 
 st.set_page_config(
         page_title="Valeurs foncières",
@@ -20,9 +11,18 @@ def main():
     a, b, c, d, e = st.columns(5)
     with c:
         st.header('Valeurs foncières', divider='rainbow')
-    f, g, h = st.columns(3)
-    with g:
-        st.caption("Trouver des informations sur des biens vendus ou estimer le prix d'un bien")
+        st.markdown(" ")
+        st.markdown(" ")
+    f, g, h, i, j = st.columns(5)
+    with f:
+        if st.button("Trouvez des informations sur des biens vendus"):
+            switch_page("cherchez des informations sur des biens vendus")
+    with h:
+        if st.button("Estimez le prix d'un bien"):
+            switch_page("estimez le prix d'un bien")
+    with j:
+        if st.button("Estimez le loyer d'un logement"):
+            switch_page("visualisez un loyer")
 
 
 if __name__ == "__main__":

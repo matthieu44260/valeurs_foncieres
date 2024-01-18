@@ -1,5 +1,9 @@
 import streamlit as st
 import duckdb
+from streamlit_extras.switch_page_button import switch_page
+
+if st.button("Accueil"):
+    switch_page("accueil")
 
 st.title("Estimez le loyer d'un bien")
 st.markdown("Estimations ANIL, à partir des données du Groupe SeLoger et de leboncoin")
