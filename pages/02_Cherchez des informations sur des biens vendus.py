@@ -11,8 +11,6 @@ from typing import Union
 st.header("Trouvez des informations sur les biens vendus des 5 dernières années")
 st.divider()
 
-con = duckdb.connect(database="donnees_immo/donnees.duckdb", read_only=False)
-
 
 def get_coordinates(city: str, street: Union[str, None] = None):
     """
@@ -162,10 +160,10 @@ def display_distributions(query: str) -> None:
         year_2022 = st.checkbox('2022')
     with y3:
         year_2021 = st.checkbox('2021')
-    #with y4:
-    #    year_2020 = st.checkbox('2020')
-    #with y5:
-    #    year_2019 = st.checkbox('2019')
+    with y4:
+        year_2020 = st.checkbox('2020')
+    with y5:
+        year_2019 = st.checkbox('2019')
     years = []
     if year_2023:
         years.append(2023)
@@ -173,10 +171,10 @@ def display_distributions(query: str) -> None:
         years.append(2022)
     if year_2021:
         years.append(2021)
-    #if year_2020:
-    #    years.append(2020)
-    #if year_2019:
-    #    years.append(2019)
+    if year_2020:
+        years.append(2020)
+    if year_2019:
+        years.append(2019)
     valeurs = con.execute(f"SELECT valeur_en_€, YEAR(date_vente) as annee FROM table_donnees WHERE "
                           f"num_departement = '{departement}' AND commune = '{commune}' AND "
                           f"annee in {tuple(years)} AND valeur_en_€<=2000000").df()
@@ -232,32 +230,39 @@ with st.sidebar:
         index=None,
         placeholder='Type de bien'
     )
-    department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees ORDER BY num_departement").df()
-    departement = st.selectbox(
-        'Choisissez votre département',
-        department_choice,
-        index=None,
-        placeholder='Département'
-    )
-    if departement:
-        city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE num_departement = '{departement}'"
-                                  f" ORDER BY commune").df()
-        commune = st.selectbox(
-            'Choisissez votre commune',
-            city_choice,
+    if type_bien:
+        if type_bien == 'Maison':
+            con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=False)
+        if type_bien == 'Appartement':
+            con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=False)
+        if type_bien == 'Local':
+            con = duckdb.connect(database="donnees_immo/vente_local.duckdb", read_only=False)
+        department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees ORDER BY num_departement").df()
+        departement = st.selectbox(
+            'Choisissez votre département',
+            department_choice,
             index=None,
-            placeholder='Commune'
+            placeholder='Département'
         )
-    if commune:
-        street_choice = con.execute(f"SELECT DISTINCT voie FROM table_donnees"
-                                    f" WHERE num_departement = '{departement}' AND commune = '{commune}'"
-                                    f" ORDER BY voie").df()
-        voie = st.selectbox(
-            'Choisissez un nom de rue',
-            street_choice,
-            index=None,
-            placeholder='nom de rue'
-        )
+        if departement:
+            city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE num_departement = '{departement}'"
+                                      f" ORDER BY commune").df()
+            commune = st.selectbox(
+                'Choisissez votre commune',
+                city_choice,
+                index=None,
+                placeholder='Commune'
+            )
+        if commune:
+            street_choice = con.execute(f"SELECT DISTINCT voie FROM table_donnees"
+                                        f" WHERE num_departement = '{departement}' AND commune = '{commune}'"
+                                        f" ORDER BY voie").df()
+            voie = st.selectbox(
+                'Choisissez un nom de rue',
+                street_choice,
+                index=None,
+                placeholder='nom de rue'
+            )
 
 # Display prices and examples
 if type_bien:
