@@ -33,6 +33,7 @@ with col_a:
         model = load('./donnees_immo/model_maison.joblib')
     if type_bien == 'Appartement':
         con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=False)
+        model = load('./donnees_immo/model_appt.joblib')
     if type_bien:
         col_d, col_e, col_f = st.columns(3)
         with col_d:
