@@ -261,11 +261,11 @@ with col_bien:
 
 if type_bien:
     if type_bien == 'Maison':
-        con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=True)
     if type_bien == 'Appartement':
-        con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=True)
     if type_bien == 'Local':
-        con = duckdb.connect(database="donnees_immo/vente_local.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/vente_local.duckdb", read_only=True)
     with col_dep:
         department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees ORDER BY num_departement").df()
         departement = st.selectbox(

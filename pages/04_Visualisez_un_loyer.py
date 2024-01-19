@@ -23,9 +23,9 @@ with col_a:
 
 if type_bien:
     if type_bien == 'Maison':
-        con = duckdb.connect(database="donnees_immo/loyer_maison.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/loyer_maison.duckdb", read_only=True)
     if type_bien == 'Appartement':
-        con = duckdb.connect(database="donnees_immo/loyer_appt.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/loyer_appt.duckdb", read_only=True)
     department_choice = con.execute("SELECT DISTINCT DEP FROM table_donnees ORDER BY DEP").df()
     with col_b:
         departement = st.selectbox(

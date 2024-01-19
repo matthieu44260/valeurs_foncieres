@@ -29,10 +29,10 @@ with col_a:
             placeholder='Type de bien'
         )
     if type_bien == 'Maison':
-        con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/vente_maison.duckdb", read_only=True)
         model = load('./donnees_immo/model_maison.joblib')
     if type_bien == 'Appartement':
-        con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=False)
+        con = duckdb.connect(database="donnees_immo/vente_appt.duckdb", read_only=True)
         model = load('./donnees_immo/model_appt.joblib')
     if type_bien:
         col_d, col_e, col_f = st.columns(3)
@@ -115,6 +115,8 @@ if estimer:
     if type_bien and departement and commune:
         df_nrm = preprocessor.transform(df)
         prix = int(model.predict(df_nrm))
+        prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees "
+                              f"WHERE num_departement = '{departement}' AND commune = '{commune}'").fetchone()[0]
         if voie:
             sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = '{departement}' "
                                   f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
@@ -128,7 +130,9 @@ if estimer:
                                   f"num_departement = '{departement}' AND commune = '{commune}'").fetchone()[0]
         if surface_bien:
             prix_calcule = int(prix_m2*surface_bien)
-            prix = int((int(prix)+2*prix_calcule)/3)
+        else:
+            prix_calcule = int(prix_m2*100)
+        prix = int((int(prix) + 2 * prix_calcule) / 3)
         prix = int(prix/1000)
         prix_min = int(prix*0.97)*1000
         prix_max = int(prix*1.03)*1000
