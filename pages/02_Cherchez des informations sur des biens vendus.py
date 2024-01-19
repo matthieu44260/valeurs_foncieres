@@ -43,11 +43,11 @@ def calculate_prices(req: str) -> None:
         st.markdown("")
         st.markdown("")
         st.markdown("")
-        st.markdown("<span style='font-size:24px;'>Dans la zone sélectionée :</span>", unsafe_allow_html=True)
+        st.markdown("<span style='font-size:20px;'>Dans la zone sélectionée :</span>", unsafe_allow_html=True)
         mid_value = str("{:,}".format(int(mid_value))).replace(',',' ')
-        st.markdown(f"<span style='font-size:24px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
+        st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
                     unsafe_allow_html=True)
-        st.write(f"<span style='font-size:24px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
+        st.write(f"<span style='font-size:20px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
                  unsafe_allow_html=True)
 
 
@@ -204,6 +204,22 @@ def display_distributions(query: str) -> None:
         fig
 
 
+def display_google_maps():
+    """
+    affiche la localisation sur google maps dans une nouvelle page web
+    :return:
+    """
+    if commune:
+        query = f"{commune}"
+        if voie:
+            query = f"{commune}+{voie}"
+        a, b, c = st.columns(3)
+        with b:
+            dis_button = st.link_button("Afficher la localisation sur google maps",
+                                        "https://www.google.com/maps/place/"+query)
+            st.markdown("")
+
+
 def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     """
     fonction principale qui lance les fonctions d'affichage
@@ -213,7 +229,8 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     :param rue: rue
     """
     req = property_request(type_de_local=type_de_local, dep=departement, com=commune, rue=voie)
-    dis_map, dis_info = st.columns([0.35, 0.65])
+    display_google_maps()
+    dis_map, dis_info = st.columns([0.3, 0.7])
     with dis_map:
         #display_map(req)
         calculate_prices(req)
