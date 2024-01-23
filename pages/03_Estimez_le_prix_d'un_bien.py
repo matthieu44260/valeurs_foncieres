@@ -62,7 +62,7 @@ if type_bien:
             index=None,
             placeholder='Département'
         )
-        col_g, col_h, col_i = st.columns(3)
+        col_g, col_h = st.columns(2)
         if departement:
             with col_g:
                 city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE num_departement = '{departement}'"
@@ -74,7 +74,7 @@ if type_bien:
                     placeholder='Commune'
                 )
             if commune:
-                with col_i:
+                with col_h:
                     street_choice = con.execute(f"SELECT DISTINCT voie FROM table_donnees "
                                                 f"WHERE num_departement = '{departement}' AND commune = '{commune}' "
                                                 f"ORDER BY voie").df()
@@ -91,12 +91,6 @@ if type_bien:
                                               f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
                         if sec_cad is not None:
                             sec_cad = sec_cad[0]
-            with col_h:
-                code_postal = st.number_input(
-                    "Code postal",
-                    value=code_postal_defaut,
-                    min_value=0
-                )
 
 
 estimer = st.button(
