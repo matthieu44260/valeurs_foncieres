@@ -49,10 +49,16 @@ with col_a:
                 value=100
             )
         with col_f:
-            surface_terrain = st.number_input(
-                "Surface du terrain en m²",
-                value=0
-            )
+            if type_bien == 'Maison':
+                surface_terrain = st.number_input(
+                    "Surface du terrain en m²",
+                    value=0
+                )
+            else:
+                surface_terrasse = st.number_input(
+                    "Surface de la terrasse en m²",
+                    value=0
+                )
 
 if type_bien:
     with col_b:
@@ -110,23 +116,28 @@ if estimer:
     if type_bien and departement and commune:
         df_nrm = preprocessor.transform(df)
         prix = int(model.predict(df_nrm))
-        prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees "
-                              f"WHERE num_departement = '{departement}' AND commune = '{commune}'").fetchone()[0]
+        prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente between "
+                              f"'2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' "
+                              f"AND commune = '{commune}'").fetchone()[0]
         if voie:
-            sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = '{departement}' "
+            sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE date_vente between '2022-01-01' AND "
+                                  f"'2023-12-31' AND num_departement = '{departement}' "
                                   f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
             if sec_cad is not None:
                 sec_cad = sec_cad[0]
-            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees "
-                                  f"WHERE num_departement = '{departement}' AND commune = '{commune}' "
-                                  f"AND section = '{sec_cad}'").fetchone()[0]
+            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
+                                  f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
+                                  f"commune = '{commune}' AND section = '{sec_cad}'").fetchone()[0]
         else:
-            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE "
-                                  f"num_departement = '{departement}' AND commune = '{commune}'").fetchone()[0]
+            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
+                                  f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
+                                  f"commune = '{commune}'").fetchone()[0]
         if surface_bien:
             prix_calcule = int(prix_m2*surface_bien)
         else:
             prix_calcule = int(prix_m2*100)
+        if surface_terrasse:
+            prix_calcule = int(prix_calcule+prix_m2*0.3*surface_terrasse)
         prix = int((int(prix) + 2 * prix_calcule) / 3)
         prix = int(prix/1000)
         prix_min = int(prix*0.97)*1000
