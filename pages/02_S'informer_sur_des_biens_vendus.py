@@ -26,13 +26,36 @@ def calculate_prices(zone: str, req: str) -> None:
             message = f"d'un {type_bien.lower()}"
         st.markdown("")
         st.markdown("")
-        st.markdown("")
         st.markdown(f"<span style='font-size:20px;'>Dans {zone} :</span>", unsafe_allow_html=True)
         mid_value = str("{:,}".format(int(mid_value))).replace(',',' ')
         st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
                     unsafe_allow_html=True)
         st.write(f"<span style='font-size:20px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
                  unsafe_allow_html=True)
+
+
+def display_prices() -> None:
+    """
+    affiche les prix moyens
+    """
+    a, b, c = st.columns(3)
+    if departement:
+        with a:
+            calculate_prices("le departement sélectionné", f" FROM table_donnees "
+                                                           f"WHERE num_departement = '{departement}'")
+    if commune:
+        with b:
+            calculate_prices("la commune sélectionnée", f" FROM table_donnees WHERE num_departement = "
+                                                        f"'{departement}' AND commune = '{commune}'")
+    if voie:
+        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = '{departement}' AND "
+                              f"commune = '{commune}' AND voie = '{voie}'").fetchone()
+        if sec_cad is not None:
+            sec_cad = sec_cad[0]
+            with c:
+                calculate_prices("le quartier sélectionné", f" FROM table_donnees WHERE num_departement = "
+                                                            f"'{departement}' AND commune = '{commune}' AND "
+                                                            f"section = '{sec_cad}'")
 
 
 def display_examples(req: str) -> None:
@@ -45,7 +68,8 @@ def display_examples(req: str) -> None:
                 " commune, nbre_pieces, surface_bien, surface_terrain")
     req = "SELECT " + features + req
     properties = con.execute(req).df().sort_values('valeur_en_€', ascending=False)
-    st.write(f"Voici une liste de {len(properties)} biens vendus dans la zone sélectionnée:")
+    st.write(f"Voici une liste de {len(properties)} biens vendus dans la zone sélectionnée, "
+             f"cliquez sur une colonne pour trier selon cette colonne:")
     st.dataframe(properties, hide_index=True,
                  column_config={
                      "valeur_en_€": st.column_config.NumberColumn(format="%i"),
@@ -145,23 +169,24 @@ def display_distributions(query: str) -> None:
         2020: 'pink',
         2019: 'orange'
     }
-    valeurs = con.execute(f"SELECT valeur_en_€, YEAR(date_vente) as annee FROM table_donnees WHERE "
-                          f"num_departement = '{departement}' AND commune = '{commune}' AND "
-                          f"annee in {tuple(years)} AND valeur_en_€<=2000000").df()
-    if valeurs.empty:
-        st.markdown("Il n'y a aucun bien vendu dans cette commune sur la période choisie")
-    elif valeurs.shape[0] == 1:
-        st.markdown("Sélectionnez d'autres années")
-    else:
-        fig, ax = plt.subplots()
-        sns.histplot(data=valeurs, x='valeur_en_€', bins=20, kde=True, log_scale=False, hue='annee',
-                     multiple='dodge', palette=couleurs)
-        ax = plt.gca()
-        ax.xaxis.set_major_formatter('{x:,.0f}')
-        plt.xticks(rotation=45)
-        plt.xlabel("Valeur en €")
-        plt.ylabel("Nombre de ventes")
-        fig
+    if year_2023 or year_2022 or year_2021 or year_2020 or year_2019:
+        valeurs = con.execute(f"SELECT valeur_en_€, YEAR(date_vente) as annee FROM table_donnees WHERE "
+                              f"num_departement = '{departement}' AND commune = '{commune}' AND "
+                              f"annee in {tuple(years)} AND valeur_en_€<=2000000").df()
+        if valeurs.empty:
+            st.markdown("Il n'y a aucun bien vendu dans cette commune sur la période choisie")
+        elif valeurs.shape[0] == 1:
+            st.markdown("Sélectionnez d'autres années")
+        else:
+            fig, ax = plt.subplots()
+            sns.histplot(data=valeurs, x='valeur_en_€', bins=20, kde=True, stat='count', hue='annee',
+                         multiple='dodge', palette=couleurs)
+            ax = plt.gca()
+            ax.xaxis.set_major_formatter('{x:,.0f}')
+            plt.xticks(rotation=45)
+            plt.xlabel("Valeur en €")
+            plt.ylabel("Nombre de ventes")
+            fig
 
 
 def display_google_maps():
@@ -190,23 +215,10 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     """
     req = property_request(type_de_local=type_de_local, dep=departement, com=commune, rue=voie)
     display_google_maps()
-    a, b, c = st.columns(3)
-    if departement:
-        with a:
-            calculate_prices("le departement sélectionné", f" FROM table_donnees WHERE num_departement = '{departement}'")
-    if commune:
-        with b:
-            calculate_prices("la commune sélectionnée", f" FROM table_donnees WHERE num_departement = '{departement}' AND commune = '{commune}'")
-    if voie:
-        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = '{departement}' AND "
-                            f"commune = '{commune}' AND voie = '{rue}'").fetchone()
-        if sec_cad is not None:
-            sec_cad = sec_cad[0]
-            with c:
-                calculate_prices("le quartier sélectionné", f" FROM table_donnees WHERE num_departement = '{departement}' AND "
-                                 f"commune = '{commune}' AND section = '{sec_cad}'")
+    display_prices()
     st.divider()
     display_examples(req)
+    st.divider()
     dis_var1, dis_var2 = st.columns(2)
     with dis_var1:
         display_variations(req, 'valeur_en_€', "**Evolution du prix moyen de vente**")
