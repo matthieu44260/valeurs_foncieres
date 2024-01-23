@@ -3,6 +3,7 @@ import duckdb
 import seaborn as sns
 import matplotlib.pyplot as plt
 from streamlit_extras.switch_page_button import switch_page
+from matplotlib.ticker import FuncFormatter
 
 if st.button("Accueil"):
     switch_page("accueil")
@@ -137,11 +138,18 @@ def display_variations(query: str, col: str, titre: str) -> None:
     st.line_chart(df, x='periode', color=colors, use_container_width=True)
 
 
+def format_y_axis(value, _):
+    if value.is_integer():
+        return int(value)
+    else:
+        return ""
+
+
 def display_distributions() -> None:
     """
     affiche la distribution des ventes selon le prix et l'année
     """
-    st.markdown(f"**Répartition des ventes selon le prix pour la commune de {commune}**")
+    st.markdown(f"**Nombre de ventes selon le prix pour la commune de {commune}**")
     st.markdown('Choisissez la ou les années :')
     y1, y2, y3, y4, y5 = st.columns(5)
     with y1:
@@ -187,6 +195,7 @@ def display_distributions() -> None:
             ax = plt.gca()
             ax.xaxis.set_major_formatter('{x:,.0f}')
             plt.xticks(rotation=45)
+            plt.gca().yaxis.set_major_formatter(FuncFormatter(format_y_axis))
             plt.xlabel("Valeur en €")
             plt.ylabel("Nombre de ventes")
             fig

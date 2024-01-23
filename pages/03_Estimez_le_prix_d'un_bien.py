@@ -9,7 +9,8 @@ preprocessor = load('./donnees_immo/preprocessor.joblib')
 if st.button("Accueil"):
     switch_page("accueil")
 
-st.header("Complétez les critères dont vous disposez et appuyez sur Estimation")
+st.header("Estimez le prix d'un bien")
+st.subheader("Complétez les critères et appuyez sur Estimation")
 st.divider()
 
 code_postal_defaut = None
@@ -132,7 +133,7 @@ if estimer:
         prix_max = int(prix*1.03)*1000
         prix_min = str("{:,}".format(prix_min)).replace(',', ' ')
         prix_max = str("{:,}".format(prix_max)).replace(',', ' ')
-        st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}]")
-        st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus")
+        st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}] €.")
+        st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus.")
     else:
         st.markdown("Complétez le type de bien, le département et la commune")
