@@ -15,8 +15,8 @@ def main():
         st.markdown(" ")
     f, g, h, i, j = st.columns(5)
     with f:
-        if st.button("Trouvez des informations sur des biens vendus"):
-            switch_page("cherchez des informations sur des biens vendus")
+        if st.button("S'informer sur des biens vendus"):
+            switch_page("s'informer sur des biens vendus")
     with h:
         if st.button("Estimez le prix d'un bien"):
             switch_page("estimez le prix d'un bien")

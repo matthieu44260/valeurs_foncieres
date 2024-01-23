@@ -1,11 +1,7 @@
 import streamlit as st
 import duckdb
-import folium
 import seaborn as sns
 import matplotlib.pyplot as plt
-from streamlit_folium import st_folium
-from geopy.geocoders import Nominatim
-from typing import Union
 from streamlit_extras.switch_page_button import switch_page
 
 if st.button("Accueil"):
@@ -13,19 +9,6 @@ if st.button("Accueil"):
 
 st.header("Trouvez des informations sur les biens vendus des 5 dernières années")
 st.divider()
-
-
-def get_coordinates(city: str, street: Union[str, None] = None):
-    """
-    Renvoie les coordonnées GPS en fonction des paramètres fournis
-    """
-    geolocator = Nominatim(user_agent="my_geocoder")
-    if street:
-        full_address = f"{street}, {city}, 'France'"
-    else:
-        full_address = f"{city}, 'France'"
-    location = geolocator.geocode(full_address)
-    return location
 
 
 def calculate_prices(req: str) -> None:
@@ -94,37 +77,6 @@ def property_request(type_de_local: str, dep: int, com: str, rue: str) -> str:
                     query = query + f" AND section = '{sec_cad}'"
         query = query + f" AND type_local = {type_de_local}"
         return query
-
-
-def display_map(req: str) -> None:
-    """
-    Affiche la carte et des marqueurs en fonction de la rue choisie
-    """
-    if departement:
-        coordinates = get_coordinates(departement*1000)
-        zoom = 8
-        if commune:
-            coordinates = get_coordinates(commune)
-            zoom = 13
-            if voie:
-                coordinates = get_coordinates(commune, voie)
-                zoom = 16
-        if coordinates:
-            carte = folium.Map(location=[coordinates.latitude, coordinates.longitude], zoom_start=zoom)
-            # Marker de la sélection
-            (folium
-             .Marker(location=[coordinates.latitude, coordinates.longitude], icon=folium.Icon(color="green"))
-             .add_to(carte))
-            # Marker des exemples
-            if voie:
-                streets = con.execute("SELECT DISTINCT(voie) " + req).fetchall()
-                for i in range(min(5, len(streets))):
-                    street = streets[i][0]
-                    coord = get_coordinates(city=commune, street=street)
-                    (folium
-                     .Marker(location=[coord.latitude, coord.longitude], icon=folium.Icon(color="yellow"))
-                     .add_to(carte))
-            st_folium(carte)
 
 
 def display_variations(query: str, col: str, titre: str) -> None:
@@ -232,7 +184,6 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     display_google_maps()
     dis_map, dis_info = st.columns([0.3, 0.7])
     with dis_map:
-        #display_map(req)
         calculate_prices(req)
     with dis_info:
         display_examples(req)
