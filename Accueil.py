@@ -33,8 +33,8 @@ def main():
         st.markdown("<span style='font-size:20px;'>Trouver les loyers pratiqués dans une commune</span>",
                     unsafe_allow_html=True)
         st.markdown(" ")
-        if st.button("Estimez le loyer d'un logement"):
-            switch_page("visualisez un loyer")
+        if st.button("Obtenir le loyer d'un logement"):
+            switch_page("Obtenir le loyer d'un logement")
 
 
 if __name__ == "__main__":

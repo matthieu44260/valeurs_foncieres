@@ -45,7 +45,7 @@ with col_a:
             surface_bien = st.number_input(
                 "Surface du bien en m²",
                 min_value=0,
-                value=None
+                value=100
             )
         with col_f:
             surface_terrain = st.number_input(
@@ -132,6 +132,7 @@ if estimer:
         prix_max = int(prix*1.03)*1000
         prix_min = str("{:,}".format(prix_min)).replace(',', ' ')
         prix_max = str("{:,}".format(prix_max)).replace(',', ' ')
-        st.subheader(f"Ce bien est estimé entre :blue[{prix_min}] et :blue[{prix_max}]")
+        st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}]")
+        st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus")
     else:
         st.markdown("Complétez le type de bien, le département et la commune")

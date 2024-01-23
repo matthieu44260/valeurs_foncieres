@@ -27,7 +27,7 @@ def calculate_prices(zone: str, req: str) -> None:
         st.markdown("")
         st.markdown("")
         st.markdown(f"<span style='font-size:20px;'>Dans {zone} :</span>", unsafe_allow_html=True)
-        mid_value = str("{:,}".format(int(mid_value))).replace(',',' ')
+        mid_value = str("{:,}".format(int(mid_value))).replace(',', ' ')
         st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
                     unsafe_allow_html=True)
         st.write(f"<span style='font-size:20px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
@@ -127,9 +127,9 @@ def display_variations(query: str, col: str, titre: str) -> None:
         sec_cad = con.execute("SELECT section" + query).fetchone()
         if sec_cad is not None:
             sec_cad = sec_cad[0]
-            req_zone = (f"SELECT DATE_TRUNC('quarter', date_vente) AS periode,"
-                        f"MEAN({col}) AS prix_pour_le_quartier FROM table_donnees WHERE num_departement = '{departement}' "
-                        f"AND commune = '{commune}' AND section = '{sec_cad}' GROUP BY periode ORDER BY periode")
+            req_zone = (f"SELECT DATE_TRUNC('quarter', date_vente) AS periode, MEAN({col}) AS prix_pour_le_quartier "
+                        f"FROM table_donnees WHERE num_departement = '{departement}' AND commune = '{commune}' AND "
+                        f"section = '{sec_cad}' GROUP BY periode ORDER BY periode")
             df_zone = con.execute(req_zone).df()
             df = duckdb.sql("SELECT * FROM df_zone JOIN df USING(periode)").df()
             colors.append("#fcd703")
@@ -137,7 +137,10 @@ def display_variations(query: str, col: str, titre: str) -> None:
     st.line_chart(df, x='periode', color=colors, use_container_width=True)
 
 
-def display_distributions(query: str) -> None:
+def display_distributions() -> None:
+    """
+    affiche la distribution des ventes selon le prix et l'année
+    """
     st.markdown(f"**Répartition des ventes selon le prix pour la commune de {commune}**")
     st.markdown('Choisissez la ou les années :')
     y1, y2, y3, y4, y5 = st.columns(5)
@@ -205,13 +208,10 @@ def display_google_maps():
             st.markdown("")
 
 
-def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
+def application(type_de_local: str) -> None:
     """
     fonction principale qui lance les fonctions d'affichage
     :param type_de_local: Maison, Appartement ou Local
-    :param dep: departement
-    :param com: commune
-    :param rue: rue
     """
     req = property_request(type_de_local=type_de_local, dep=departement, com=commune, rue=voie)
     display_google_maps()
@@ -227,7 +227,7 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     dis_distrib, dis_year = st.columns(2)
     with dis_distrib:
         if commune:
-            display_distributions(req)
+            display_distributions()
 
 
 commune = ''
@@ -250,7 +250,8 @@ if type_bien:
     if type_bien == 'Local':
         con = duckdb.connect(database="donnees_immo/vente_local.duckdb", read_only=True)
     with col_dep:
-        department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees ORDER BY num_departement").df()
+        department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees "
+                                        "ORDER BY num_departement").df()
         departement = st.selectbox(
             'Choisissez votre département',
             department_choice,
@@ -259,8 +260,8 @@ if type_bien:
         )
     if departement:
         with col_com:
-            city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE num_departement = '{departement}'"
-                                      f" ORDER BY commune").df()
+            city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE "
+                                      f"num_departement = '{departement}' ORDER BY commune").df()
             commune = st.selectbox(
                 'Choisissez votre commune',
                 city_choice,
@@ -282,4 +283,4 @@ if type_bien:
 # Display prices and examples
 if type_bien:
     if departement:
-        application(type_de_local=f"'{type_bien}'", dep=departement, com=commune, rue=voie)
+        application(type_de_local=f"'{type_bien}'")
