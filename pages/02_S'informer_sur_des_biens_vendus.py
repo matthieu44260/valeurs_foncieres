@@ -11,9 +11,10 @@ st.header("Trouvez des informations sur les biens vendus des 5 dernières année
 st.divider()
 
 
-def calculate_prices(req: str) -> None:
+def calculate_prices(zone: str, req: str) -> None:
     """
     Calcule et affiche la valeur moyenne et le prix au m² d'un bien selon le département, la commune et la rue
+    :param zone: soit le département, la commune ou le quartier
     :param req: la requête
     """
     mid_value = con.execute("SELECT MEAN(valeur_en_€)" + req).fetchone()[0]
@@ -26,7 +27,7 @@ def calculate_prices(req: str) -> None:
         st.markdown("")
         st.markdown("")
         st.markdown("")
-        st.markdown("<span style='font-size:20px;'>Dans la zone sélectionée :</span>", unsafe_allow_html=True)
+        st.markdown(f"<span style='font-size:20px;'>Dans {zone} :</span>", unsafe_allow_html=True)
         mid_value = str("{:,}".format(int(mid_value))).replace(',',' ')
         st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
                     unsafe_allow_html=True)
@@ -137,6 +138,13 @@ def display_distributions(query: str) -> None:
         years.append(2020)
     if year_2019:
         years.append(2019)
+    couleurs = {
+        2023: 'blue',
+        2022: 'green',
+        2021: 'yellow',
+        2020: 'pink',
+        2019: 'orange'
+    }
     valeurs = con.execute(f"SELECT valeur_en_€, YEAR(date_vente) as annee FROM table_donnees WHERE "
                           f"num_departement = '{departement}' AND commune = '{commune}' AND "
                           f"annee in {tuple(years)} AND valeur_en_€<=2000000").df()
@@ -147,7 +155,7 @@ def display_distributions(query: str) -> None:
     else:
         fig, ax = plt.subplots()
         sns.histplot(data=valeurs, x='valeur_en_€', bins=20, kde=True, log_scale=False, hue='annee',
-                     multiple='dodge', palette='deep')
+                     multiple='dodge', palette=couleurs)
         ax = plt.gca()
         ax.xaxis.set_major_formatter('{x:,.0f}')
         plt.xticks(rotation=45)
@@ -182,11 +190,23 @@ def application(type_de_local: str, dep: int, com: str, rue: str) -> None:
     """
     req = property_request(type_de_local=type_de_local, dep=departement, com=commune, rue=voie)
     display_google_maps()
-    dis_map, dis_info = st.columns([0.3, 0.7])
-    with dis_map:
-        calculate_prices(req)
-    with dis_info:
-        display_examples(req)
+    a, b, c = st.columns(3)
+    if departement:
+        with a:
+            calculate_prices("le departement sélectionné", f" FROM table_donnees WHERE num_departement = '{departement}'")
+    if commune:
+        with b:
+            calculate_prices("la commune sélectionnée", f" FROM table_donnees WHERE num_departement = '{departement}' AND commune = '{commune}'")
+    if voie:
+        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = '{departement}' AND "
+                            f"commune = '{commune}' AND voie = '{rue}'").fetchone()
+        if sec_cad is not None:
+            sec_cad = sec_cad[0]
+            with c:
+                calculate_prices("le quartier sélectionné", f" FROM table_donnees WHERE num_departement = '{departement}' AND "
+                                 f"commune = '{commune}' AND section = '{sec_cad}'")
+    st.divider()
+    display_examples(req)
     dis_var1, dis_var2 = st.columns(2)
     with dis_var1:
         display_variations(req, 'valeur_en_€', "**Evolution du prix moyen de vente**")
