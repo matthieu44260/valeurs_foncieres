@@ -4,6 +4,71 @@ import duckdb
 from joblib import load
 from streamlit_extras.switch_page_button import switch_page
 
+
+def calcul_price_house() -> None:
+    """
+    Calcule le prix d'une maison
+    """
+    df_nrm = preprocessor.transform(df)
+    prix = int(model.predict(df_nrm))
+    prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente between "
+                          f"'2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' "
+                          f"AND commune = '{commune}'").fetchone()[0]
+    if voie:
+        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE date_vente between '2022-01-01' AND "
+                              f"'2023-12-31' AND num_departement = '{departement}' "
+                              f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
+        if sec_cad is not None:
+            sec_cad = sec_cad[0]
+            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
+                                  f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
+                                  f"commune = '{commune}' AND section = '{sec_cad}'").fetchone()[0]
+    else:
+        prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
+                              f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
+                              f"commune = '{commune}'").fetchone()[0]
+    prix_calcule = int(prix_m2 * surface_bien)
+    prix = int((int(prix) + 2 * prix_calcule) / 3)
+    prix = int(prix / 1000)
+    prix_min = int(prix * 0.97) * 1000
+    prix_max = int(prix * 1.03) * 1000
+    prix_min = str("{:,}".format(prix_min)).replace(',', ' ')
+    prix_max = str("{:,}".format(prix_max)).replace(',', ' ')
+    st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}] €.")
+    st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus.")
+
+
+def calcul_price_appt() -> None:
+    """
+    Calcule le prix d'un appartement
+    """
+    prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente between "
+                          f"'2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' "
+                          f"AND commune = '{commune}'").fetchone()[0]
+    if voie:
+        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE date_vente between '2022-01-01' AND "
+                              f"'2023-12-31' AND num_departement = '{departement}' "
+                              f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
+        if sec_cad is not None:
+            sec_cad = sec_cad[0]
+            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
+                                  f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
+                                  f"commune = '{commune}' AND section = '{sec_cad}'").fetchone()[0]
+    else:
+        prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
+                              f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
+                              f"commune = '{commune}'").fetchone()[0]
+    prix_calcule = int(prix_m2 * surface_bien)
+    prix_calcule = int(prix_calcule + prix_m2 * 0.3 * surface_terrasse)
+    prix = int(prix_calcule / 1000)
+    prix_min = int(prix * 0.97) * 1000
+    prix_max = int(prix * 1.03) * 1000
+    prix_min = str("{:,}".format(prix_min)).replace(',', ' ')
+    prix_max = str("{:,}".format(prix_max)).replace(',', ' ')
+    st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}] €.")
+    st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus.")
+
+
 preprocessor = load('./donnees_immo/preprocessor.joblib')
 
 if st.button("Accueil"):
@@ -15,10 +80,11 @@ st.divider()
 
 code_postal_defaut = None
 code_postal = None
-sec_cad = None
+sec_cad = ""
 nbre_pieces = None
-surface_bien = None
-surface_terrain = None
+surface_bien = 100
+surface_terrain = 0
+surface_terrasse = 0
 
 col_a, col_b = st.columns(2)
 
@@ -114,37 +180,9 @@ df = pd.DataFrame({
 
 if estimer:
     if type_bien and departement and commune:
-        df_nrm = preprocessor.transform(df)
-        prix = int(model.predict(df_nrm))
-        prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente between "
-                              f"'2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' "
-                              f"AND commune = '{commune}'").fetchone()[0]
-        if voie:
-            sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE date_vente between '2022-01-01' AND "
-                                  f"'2023-12-31' AND num_departement = '{departement}' "
-                                  f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
-            if sec_cad is not None:
-                sec_cad = sec_cad[0]
-            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
-                                  f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
-                                  f"commune = '{commune}' AND section = '{sec_cad}'").fetchone()[0]
+        if type_bien == 'Maison':
+            calcul_price_house()
         else:
-            prix_m2 = con.execute(f"SELECT SUM(valeur_en_€)/SUM(surface_bien) FROM table_donnees WHERE date_vente "
-                                  f"between '2022-01-01' AND '2023-12-31' AND num_departement = '{departement}' AND "
-                                  f"commune = '{commune}'").fetchone()[0]
-        if surface_bien:
-            prix_calcule = int(prix_m2*surface_bien)
-        else:
-            prix_calcule = int(prix_m2*100)
-        if surface_terrasse:
-            prix_calcule = int(prix_calcule+prix_m2*0.3*surface_terrasse)
-        prix = int((int(prix) + 2 * prix_calcule) / 3)
-        prix = int(prix/1000)
-        prix_min = int(prix*0.97)*1000
-        prix_max = int(prix*1.03)*1000
-        prix_min = str("{:,}".format(prix_min)).replace(',', ' ')
-        prix_max = str("{:,}".format(prix_max)).replace(',', ' ')
-        st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}] €.")
-        st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus.")
+            calcul_price_appt()
     else:
         st.markdown("Complétez le type de bien, le département et la commune")
