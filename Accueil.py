@@ -35,6 +35,12 @@ def main():
         st.markdown(" ")
         if st.button("Obtenir le loyer d'un logement"):
             switch_page("Obtenir le loyer d'un logement")
+    for i in range(20):
+        st.markdown("")
+    st.markdown("<u>Source:</u> Ministère de l'Economie, des Finances et de la souveraineté industrielle et numérique.",
+                unsafe_allow_html=True)
+    st.markdown("Données originales téléchargées sur http://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/"
+                ", mise à jour du 10 octobre 2023.")
 
 
 if __name__ == "__main__":

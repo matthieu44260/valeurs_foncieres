@@ -8,7 +8,7 @@ from matplotlib.ticker import FuncFormatter
 if st.button("Accueil"):
     switch_page("accueil")
 
-st.header("Trouvez des informations sur les biens vendus des 5 dernières années")
+st.header("Trouvez des informations sur les biens vendus entre 2019 et 2023")
 st.divider()
 
 
@@ -19,6 +19,7 @@ def calculate_prices(zone: str, req: str) -> None:
     :param req: la requête
     """
     mid_value = con.execute("SELECT MEAN(valeur_en_€)" + req).fetchone()[0]
+    median_value = con.execute("SELECT QUANTILE_CONT(valeur_en_€,0.5)" + req).fetchone()[0]
     price_by_m = con.execute("SELECT SUM(valeur_en_€)/SUM(surface_bien)" + req).fetchone()[0]
     if mid_value and price_by_m:
         if type_bien == 'Maison':
@@ -29,10 +30,13 @@ def calculate_prices(zone: str, req: str) -> None:
         st.markdown("")
         st.markdown(f"<span style='font-size:20px;'>Dans {zone} :</span>", unsafe_allow_html=True)
         mid_value = str("{:,}".format(int(mid_value))).replace(',', ' ')
+        median_value = str("{:,}".format(int(median_value))).replace(',', ' ')
         st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
                     unsafe_allow_html=True)
-        st.write(f"<span style='font-size:20px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
-                 unsafe_allow_html=True)
+        st.markdown(f"<span style='font-size:20px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
+                    unsafe_allow_html=True)
+        st.markdown(f"<span style='font-size:20px;'>le prix médian {message} est de :blue[**{median_value} €**]</span>",
+                    unsafe_allow_html=True)
 
 
 def display_prices() -> None:
@@ -64,19 +68,20 @@ def display_examples(req: str) -> None:
     Affiche  les 5 derniers biens vendus
     :param req: la requête
     """
-    features = ("type_local, CONCAT(YEAR(date_vente), '/', MONTH(date_vente), '/', DAY(date_vente)) AS date_de_vente, "
-                "valeur_en_€, numero, CONCAT(type_voie, ' ', voie) AS voie, code_postal,"
-                " commune, nbre_pieces, surface_bien, surface_terrain")
+    features = ("CONCAT(YEAR(date_vente), '/', MONTH(date_vente), '/', DAY(date_vente)) AS 'date de vente', "
+                "valeur_en_€ AS 'valeur en €', numero, CONCAT(type_voie, ' ', voie) AS voie, "
+                "code_postal AS 'code postal', commune, nbre_pieces AS 'nombre de pièces', "
+                "surface_bien AS 'surface du bien en m²', surface_terrain AS 'surface du terrain en m²'")
     req = "SELECT " + features + req
-    properties = con.execute(req).df().sort_values('valeur_en_€', ascending=False)
+    properties = con.execute(req).df().sort_values('valeur en €', ascending=False)
     st.write(f"Voici une liste de {len(properties)} biens vendus dans la zone sélectionnée, "
              f"cliquez sur une colonne pour trier selon cette colonne:")
-    st.dataframe(properties, hide_index=True,
+    st.dataframe(properties, hide_index=True, use_container_width=True,
                  column_config={
-                     "valeur_en_€": st.column_config.NumberColumn(format="%i"),
-                     "code_postal": st.column_config.NumberColumn(format="%i"),
-                     "surface_relle_bati": st.column_config.NumberColumn(format="%i"),
-                     "surface_terrain": st.column_config.NumberColumn(format="%i"),
+                     "valeur en €": st.column_config.NumberColumn(format="%i"),
+                     "code postal": st.column_config.NumberColumn(format="%i"),
+                     "surface du bien en m²": st.column_config.NumberColumn(format="%i"),
+                     "surface du terrain en m²": st.column_config.NumberColumn(format="%i"),
                      "numero": st.column_config.NumberColumn(format="%i")
                  }
                  )

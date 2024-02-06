@@ -110,7 +110,7 @@ with col_a:
             )
         with col_e:
             surface_bien = st.number_input(
-                "Surface du bien en m²",
+                "Surface réelle du bien en m²",
                 min_value=0,
                 value=100
             )
