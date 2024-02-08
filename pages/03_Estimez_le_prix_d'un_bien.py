@@ -3,6 +3,9 @@ import streamlit as st
 import duckdb
 from joblib import load
 from streamlit_extras.switch_page_button import switch_page
+from couleurs import color_page
+
+color_page()
 
 
 def calcul_price_house() -> None:
@@ -128,7 +131,8 @@ with col_a:
 
 if type_bien:
     with col_b:
-        department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees ORDER BY num_departement").df()
+        department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees "
+                                        "ORDER BY num_departement").df()
         departement = st.selectbox(
             'Choisissez votre département',
             department_choice,
@@ -138,8 +142,8 @@ if type_bien:
         col_g, col_h = st.columns(2)
         if departement:
             with col_g:
-                city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE num_departement = '{departement}'"
-                                          f" ORDER BY commune").df()
+                city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE "
+                                          f"num_departement = '{departement}' ORDER BY commune").df()
                 commune = st.selectbox(
                     'Choisissez votre commune',
                     city_choice,
@@ -158,10 +162,12 @@ if type_bien:
                         placeholder='nom de rue'
                     )
                     code_postal_defaut = con.execute(f"SELECT DISTINCT(code_postal) FROM table_donnees WHERE "
-                                              f"num_departement = '{departement}' AND commune = '{commune}'").fetchone()[0]
+                                                     f"num_departement = '{departement}' AND "
+                                                     f"commune = '{commune}'").fetchone()[0]
                     if voie:
-                        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = '{departement}' "
-                                              f"AND commune = '{commune}' AND voie = '{voie}'").fetchone()
+                        sec_cad = con.execute(f"SELECT section FROM table_donnees WHERE num_departement = "
+                                              f"'{departement}' AND commune = '{commune}' AND "
+                                              f"voie = '{voie}'").fetchone()
                         if sec_cad is not None:
                             sec_cad = sec_cad[0]
 

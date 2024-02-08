@@ -1,12 +1,15 @@
 import streamlit as st
 import duckdb
 from streamlit_extras.switch_page_button import switch_page
+from couleurs import color_page
+
+color_page()
 
 if st.button("Accueil"):
     switch_page("accueil")
 
 st.header("Obtenir le loyer d'un logement")
-st.markdown("Estimations ANIL, à partir des données du Groupe SeLoger et de leboncoin")
+st.markdown("_Estimations ANIL, à partir des données du Groupe SeLoger et de leboncoin_")
 st.divider()
 
 calcul_loyer = None

@@ -4,6 +4,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from streamlit_extras.switch_page_button import switch_page
 from matplotlib.ticker import FuncFormatter
+from couleurs import color_page
+
 
 if st.button("Accueil"):
     switch_page("accueil")
@@ -244,6 +246,7 @@ def application(type_de_local: str) -> None:
             display_distributions()
 
 
+color_page()
 commune = ''
 section = ''
 voie = ''
