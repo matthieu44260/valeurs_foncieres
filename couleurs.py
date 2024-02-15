@@ -52,7 +52,6 @@ def background_header(file, size) -> None:
 
 
 def color_page():
-    color_sidebar()
     page_by_img = """
     <style>
     [data-testid="stAppViewContainer"] {
