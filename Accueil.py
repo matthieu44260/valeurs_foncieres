@@ -9,6 +9,14 @@ st.set_page_config(
     )
 
 
+#def local_css(file_name):
+#    with open(file_name) as f:
+#        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+#
+## Utilisez la fonction local_css() pour inclure le fichier CSS
+#local_css("theme.css")
+
+
 def main():
     background_image('./images/image_accueil.jpg')
     color_sidebar()
@@ -18,7 +26,7 @@ def main():
         st.markdown(" ")
     m, n, p = st.columns(3)
     with n:
-        st.subheader("Sur notre application, vous pouvez :")
+        st.subheader("Avec cette application, vous pouvez :")
         st.markdown(" ")
     f, g, h, i, j = st.columns(5)
     with f:

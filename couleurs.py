@@ -32,11 +32,32 @@ def background_image(file) -> None:
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
 
+def background_header(file, size) -> None:
+    """
+    affiche une image en fond d'écran sur le titre de la page
+    :param file: image à afficher
+    :param size: taille de l'image en %
+    """
+    img = get_img_as_base64(file)
+    page_bg_img = f"""
+        <style>
+        [data-testid="stAppViewContainer"] > .main {{
+        background-image: url("data:image/png;base64,{img}");
+        background-size: {size};
+        background-position: top right;
+        background-repeat: no-repeat;
+        background-attachment: local;
+        }}</style>"""
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+
 def color_page():
     color_sidebar()
     page_by_img = """
     <style>
-    [data-testid="stAppViewContainer"] {background-color: #d8f2f0}
+    [data-testid="stAppViewContainer"] {
+    background-color: #51bdb4
+    }
     </style>
     """
     st.markdown(page_by_img, unsafe_allow_html=True)
