@@ -6,7 +6,7 @@ from streamlit_extras.switch_page_button import switch_page
 from couleurs import color_sidebar, background_header, color_page
 
 #background_header("./images/image_page3.jpg", '25%')
-color_sidebar()
+#color_sidebar()
 color_page()
 
 

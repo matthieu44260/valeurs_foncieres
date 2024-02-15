@@ -3,7 +3,7 @@ import duckdb
 from streamlit_extras.switch_page_button import switch_page
 from couleurs import color_sidebar, color_page, background_header
 
-color_sidebar()
+#color_sidebar()
 color_page()
 #background_header("./images/image_page4.jpg", "30%")
 

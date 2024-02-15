@@ -19,7 +19,7 @@ st.set_page_config(
 
 def main():
     background_image('./images/image_accueil.jpg')
-    color_sidebar()
+    #color_sidebar()
     a, b, c, d, e = st.columns(5)
     with c:
         st.header('Valeurs foncières', divider='rainbow')

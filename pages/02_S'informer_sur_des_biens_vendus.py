@@ -6,7 +6,7 @@ from streamlit_extras.switch_page_button import switch_page
 from matplotlib.ticker import FuncFormatter
 from couleurs import color_sidebar, color_page, background_header
 
-color_sidebar()
+#color_sidebar()
 color_page()
 #background_header("./images/image_page2.jpg", '25%')
 
