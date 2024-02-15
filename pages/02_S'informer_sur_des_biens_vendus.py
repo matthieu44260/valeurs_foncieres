@@ -36,11 +36,11 @@ def calculate_prices(zone: str, req: str) -> None:
         st.markdown(f"<span style='font-size:20px;'>Dans {zone} :</span>", unsafe_allow_html=True)
         mid_value = str("{:,}".format(int(mid_value))).replace(',', ' ')
         median_value = str("{:,}".format(int(median_value))).replace(',', ' ')
-        st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :blue[**{mid_value} €**]</span>",
+        st.markdown(f"<span style='font-size:20px;'>le prix moyen {message} est de :red[**{mid_value} €**]</span>",
                     unsafe_allow_html=True)
-        st.markdown(f"<span style='font-size:20px;'>le prix moyen au m² est de :blue[**{int(price_by_m)} €**]</span>",
+        st.markdown(f"<span style='font-size:20px;'>le prix moyen au m² est de :red[**{int(price_by_m)} €**]</span>",
                     unsafe_allow_html=True)
-        st.markdown(f"<span style='font-size:20px;'>le prix médian {message} est de :blue[**{median_value} €**]</span>",
+        st.markdown(f"<span style='font-size:20px;'>le prix médian {message} est de :red[**{median_value} €**]</span>",
                     unsafe_allow_html=True)
 
 

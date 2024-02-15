@@ -59,7 +59,7 @@ if commune:
                                    f"AND commune = '{commune}'").fetchone()[0]
     st.markdown(" ")
     st.markdown(f"<span style='font-size:24px;'>Les loyers pour un bien ({type_bien}) dans la commune de {commune} "
-                f"varient entre :blue[{fourchette_basse}] et :blue[{fourchette_haute}] € au m².</span>",
+                f"varient entre :red[{fourchette_basse}] et :red[{fourchette_haute}] € au m².</span>",
                 unsafe_allow_html=True)
     st.markdown(" ")
     col_d, col_e, col_f = st.columns(3)

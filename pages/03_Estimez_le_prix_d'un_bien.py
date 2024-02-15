@@ -39,7 +39,7 @@ def calcul_price_house() -> None:
     prix_max = int(prix * 1.03) * 1000
     prix_min = str("{:,}".format(prix_min)).replace(',', ' ')
     prix_max = str("{:,}".format(prix_max)).replace(',', ' ')
-    st.subheader(f"Notre algorithme a estimé ce bien entre :blue[{prix_min}] et :blue[{prix_max}] €.")
+    st.subheader(f"Notre algorithme a estimé ce bien entre :red[{prix_min}] et :red[{prix_max}] €.")
     st.markdown("Cette estimation n'a pas de valeur contractuelle, elle est basée sur des biens déjà vendus.")
 
 
