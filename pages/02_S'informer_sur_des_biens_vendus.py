@@ -4,11 +4,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from streamlit_extras.switch_page_button import switch_page
 from matplotlib.ticker import FuncFormatter
-from couleurs import color_sidebar, color_page, background_header
+from couleurs import color_page, background_header
 
-#color_sidebar()
 color_page()
-#background_header("./images/image_page2.jpg", '25%')
+background_header("./images/image_page2.jpg", '27%')
 
 if st.button("Accueil"):
     switch_page("accueil")
@@ -255,7 +254,7 @@ voie = ''
 col_bien, col_dep, col_com, col_rue = st.columns(4)
 with col_bien:
     type_bien = st.selectbox(
-        ':violet[Choisissez le type de bien]',
+        'Choisissez le type de bien',
         ['Maison', 'Appartement', 'Local'],
         index=None,
         placeholder='Type de bien'
@@ -272,7 +271,7 @@ if type_bien:
         department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees "
                                         "ORDER BY num_departement").df()
         departement = st.selectbox(
-            ':violet[Choisissez votre département]',
+            'Choisissez votre département',
             department_choice,
             index=None,
             placeholder='Département'
@@ -282,7 +281,7 @@ if type_bien:
             city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE "
                                       f"num_departement = '{departement}' ORDER BY commune").df()
             commune = st.selectbox(
-                ':violet[Choisissez votre commune]',
+                'Choisissez votre commune',
                 city_choice,
                 index=None,
                 placeholder='Commune'
@@ -293,7 +292,7 @@ if type_bien:
                                         f" WHERE num_departement = '{departement}' AND commune = '{commune}'"
                                         f" ORDER BY voie").df()
             voie = st.selectbox(
-                ':violet[Choisissez un nom de rue]',
+                'Choisissez un nom de rue',
                 street_choice,
                 index=None,
                 placeholder='nom de rue'

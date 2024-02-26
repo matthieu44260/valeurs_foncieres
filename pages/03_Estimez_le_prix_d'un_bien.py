@@ -3,10 +3,9 @@ import streamlit as st
 import duckdb
 from joblib import load
 from streamlit_extras.switch_page_button import switch_page
-from couleurs import color_sidebar, background_header, color_page
+from couleurs import background_header, color_page
 
-#background_header("./images/image_page3.jpg", '25%')
-#color_sidebar()
+background_header("./images/image_page3.jpg", '26%')
 color_page()
 
 
@@ -95,7 +94,7 @@ col_a, col_b = st.columns(2)
 
 with col_a:
     type_bien = st.selectbox(
-            ':violet[Choisissez le type de bien]',
+            'Choisissez le type de bien',
             ['Maison', 'Appartement'],
             index=None,
             placeholder='Type de bien'
@@ -110,24 +109,24 @@ with col_a:
         col_d, col_e, col_f = st.columns(3)
         with col_d:
             nbre_pieces = st.number_input(
-                ":violet[Nombre de pièces]",
+                "Nombre de pièces",
                 min_value=0
             )
         with col_e:
             surface_bien = st.number_input(
-                ":violet[Surface réelle du bien en m²]",
+                "Surface réelle du bien en m²",
                 min_value=0,
                 value=100
             )
         with col_f:
             if type_bien == 'Maison':
                 surface_terrain = st.number_input(
-                    ":violet[Surface du terrain en m²]",
+                    "Surface du terrain en m²",
                     value=0
                 )
             else:
                 surface_terrasse = st.number_input(
-                    ":violet[Surface de la terrasse en m²]",
+                    "Surface de la terrasse en m²",
                     value=0
                 )
 
@@ -136,7 +135,7 @@ if type_bien:
         department_choice = con.execute("SELECT DISTINCT num_departement FROM table_donnees "
                                         "ORDER BY num_departement").df()
         departement = st.selectbox(
-            ':violet[Choisissez votre département]',
+            'Choisissez votre département',
             department_choice,
             index=None,
             placeholder='Département'
@@ -147,7 +146,7 @@ if type_bien:
                 city_choice = con.execute(f"SELECT DISTINCT commune FROM table_donnees WHERE "
                                           f"num_departement = '{departement}' ORDER BY commune").df()
                 commune = st.selectbox(
-                    ':violet[Choisissez votre commune]',
+                    'Choisissez votre commune',
                     city_choice,
                     index=None,
                     placeholder='Commune'
@@ -158,7 +157,7 @@ if type_bien:
                                                 f"WHERE num_departement = '{departement}' AND commune = '{commune}' "
                                                 f"ORDER BY voie").df()
                     voie = st.selectbox(
-                        ':violet[Choisissez un nom de rue]',
+                        'Choisissez un nom de rue',
                         street_choice,
                         index=None,
                         placeholder='nom de rue'
